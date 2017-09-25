@@ -1,0 +1,38 @@
+*{font-family:Gill Sans, Gill Sans MT, Myriad Pro, DejaVu Sans Condensed, Helvetica, Arial,' sans-serif'}
+body{margin:0;background-color: #f5f5f5;}
+	a{text-decoration: none;}
+img{border:none;}
+::-webkit-input-placeholder { /* WebKit browsers */  
+    color:    #d1d1d1;  
+}  
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */  
+   color:    #d1d1d1;  
+   opacity:  1;  
+}  
+::-moz-placeholder { /* Mozilla Firefox 19+ */  
+   color:    #d1d1d1;  
+   opacity:  1;  
+}  
+:-ms-input-placeholder { /* Internet Explorer 10+ */  
+   color:    #d1d1d1;  
+}
+.top_box{background-color:white;}
+.top_nav{margin-left:auto;margin-right:auto;width:50%;padding-top: 10px;}
+.top_nav a{float:left;}
+.top_nav .logo{padding-right: 16px;border-right:1px solid #b2b2b2;}
+.top_nav .welcome{font-size: 28px;line-height: 76px;text-decoration: none;padding-left: 16px;color:#333333;}
+.clearfix{clear:both;}
+.login_bg_box{background-color: #f5f5f5;}
+.login_sm_box{margin-left:auto;margin-right:auto;width:100%;}
+.login_box{width: 38%;height: 70%;background-color: white;border-radius: 20px;margin-left: 544px;margin-top:5%;position: absolute;}
+.login_box .user{margin-left:auto;margin-right:auto;color: #0087cf;font-size: 24px;padding-top:7%;padding-bottom: 8px;border-bottom: 2px solid #0087cf;width: 96px;color: #0087cf;}
+input[type=password],input[type=text]{height:52px;border: 2px solid #d1d1d1;font-size: 22px;position: relative;left: 50%;margin-left: -213px;display: block;border-radius: 4px;color: #333333; width: 422px;text-indent: 76px;}
+input[type=submit]{width:426px;height:56px;left: 50%;margin-left:-213px;display: block;position: relative;margin-top: 50px;background-color: #0087cf;font-size: 22px;color:white;border-radius: 4px;;border:none;text-align: center;}
+input[type=text]{margin-top: 40px;background-image: url(image/user_icon.png);background-repeat: no-repeat;background-position: 14px center;}
+input[type=password]{margin-top:30px;background-image: url(image/password_icon.png);background-repeat: no-repeat;background-position: 14px center;}
+.help_box{width: 426px;margin-top:22px;position: absolute;left: 50%;margin-left:-213px;}
+.help_box a{float:right;font-size: 18px;}
+	.help_box span{font-size: 18px;float: left;margin-left: 6px;}
+label{margin:0; padding:0; outline:none;}
+input[type=checkbox]{height: 26px;width:18px;margin:0; padding:0; outline:none;float:left;}
+.help_box .forget{padding-left: 12px;color: #0087cf;} 

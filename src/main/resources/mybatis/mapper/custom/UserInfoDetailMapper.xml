@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yy.ticket.mapper.UserInfoDetailMapper">
+
+
+    <resultMap id="busiTicketOrderResultMap" type="com.yy.ticket.bean.UserInfoDetail">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="gender" jdbcType="VARCHAR" property="gender"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="contact_number" jdbcType="VARCHAR" property="contactNumber"/>
+        <result column="mobile_phone" jdbcType="VARCHAR" property="mobilePhone"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="create_userid" jdbcType="BIGINT" property="createUserid"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_userid" jdbcType="BIGINT" property="updateUserid"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    
+    <select id="findByUserId" resultMap="busiTicketOrderResultMap">
+       	SELECT id,user_id,gender,email,contact_number,
+			mobile_phone,qq FROM user_info_detail
+       		<where>
+       			user_id = #{0}
+       		</where>
+    </select>
+    
+    <insert id="save">
+    	INSERT INTO user_info_detail
+			(user_id,gender,email,contact_number,mobile_phone,
+			qq,create_userid,create_time)
+			VALUES
+			(#{userId},#{gender},#{email},#{contactNumber},#{mobilePhone},
+			#{qq},#{createUserid},NOW())
+    </insert>
+    
+    <update id="update">
+    	UPDATE user_info_detail
+    	<set>
+    		<if test="gender != null || gender != ''">
+    		 gender = #{gender} ,
+    		</if>
+    		<if test="email != null || email != ''">
+    		 email = #{email},
+    		</if>
+    		<if test="contactNumber != null || contactNumber != ''">
+    		 contact_number=#{contactNumber},
+    		</if>
+    		<if test="mobilePhone != null || mobilePhone != ''">
+    		 mobile_phone=#{mobilePhone},
+    		</if>
+    		<if test="qq != null || qq != ''">
+    		 qq=#{qq},
+    		</if>
+    		<if test="updateUserid != null || updateUserid != ''">
+    		 update_userid=#{updateUserid},
+    		</if>
+    	    update_time = NOW() 
+    	</set>
+		WHERE user_id = #{userId}
+    </update>
+
+</mapper>

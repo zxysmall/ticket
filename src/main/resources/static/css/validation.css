@@ -1,0 +1,21 @@
+.error{
+	color:red;
+}
+
+input.error { border: 1px solid red; }
+label.error {
+  background:url("/ticket/image/error.png") no-repeat 5px 0px;
+  padding-left: 20px;
+/*   margin-left:2px; */
+/*   padding-bottom: 3px; */
+  text-align:center;
+  color: #EA5200;
+  font-size:12px;
+}
+label.checked {
+  background:url("/ticket/image/true.png") no-repeat 2px 0px;
+  padding-left:20px;
+  margin-left:2px;
+}
+
+label.valid {}

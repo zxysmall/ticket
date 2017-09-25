@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yy.ticket.mapper.BusiTicketOrderMapper">
+
+
+    <resultMap id="busiTicketOrderResultMap" type="com.yy.ticket.bean.BusiTicketOrder">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="single_num" jdbcType="TINYINT" property="singleNum"/>
+        <result column="single_num_privilege" jdbcType="TINYINT" property="singleNumPrivilege"/>
+        <result column="double_num" jdbcType="TINYINT" property="doubleNum"/>
+        <result column="double_num_privilege" jdbcType="TINYINT" property="doubleNumPrivilege"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="ticket_num" jdbcType="VARCHAR" property="ticketNum"/>
+        <result column="ticket_person" jdbcType="VARCHAR" property="ticketPerson"/>
+        <result column="ticket_person_identity" jdbcType="VARCHAR" property="ticketPersonIdentity"/>
+        <result column="ticket_person_phone" jdbcType="VARCHAR" property="ticketPersonPhone"/>
+        <result column="create_userid" jdbcType="BIGINT" property="createUserid"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_userid" jdbcType="BIGINT" property="updateUserid"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap id="statisticsTicketOrderResultMap" type="com.yy.ticket.vo.StatisticsVo">
+        <result column="single_num" jdbcType="TINYINT" property="singleNum"/>
+        <result column="single_num_privilege" jdbcType="TINYINT" property="singleNumPrivilege"/>
+        <result column="double_num" jdbcType="TINYINT" property="doubleNum"/>
+        <result column="double_num_privilege" jdbcType="TINYINT" property="doubleNumPrivilege"/>
+        <result column="create_userid" jdbcType="BIGINT" property="createUserid"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+    </resultMap>
+	
+	<sql id="searchSql">
+		SELECT bto.id,bto.ticket_person,bto.ticket_person_identity,bto.single_num,bto.single_num_privilege
+       		   ,bto.double_num,bto.double_num_privilege,bto.create_time,bto.status  
+       		FROM busi_ticket_order bto
+	</sql>
+	
+    <select id="findAll" resultMap="busiTicketOrderResultMap">
+       	<include refid="searchSql"/>
+       	<where>
+       	<if test="uid != 1">
+       		bto.create_userid = 3
+       	</if>
+       	</where>
+       	ORDER BY bto.create_time DESC
+    </select>
+    
+    <select id="findByTicketId" resultMap="busiTicketOrderResultMap">
+       	<include refid="searchSql"/>
+       		<where>
+       			<if test="uid != 1">
+		       		bto.create_userid = 3
+       			AND
+		       	</if>
+       			bto.ticket_person_identity like CONCAT('%',#{id})
+       		</where>
+       		ORDER BY bto.create_time  DESC
+    </select>
+    <select id="findByStatus" resultMap="busiTicketOrderResultMap">
+       	<include refid="searchSql"/>
+       		<where>
+       			bto.status = #{status} 
+       			<if test="uid != 1">
+		       	AND  bto.update_userid = #{uid}
+		       	</if>
+       			<if test="ticketId != null and ticketId != ''">
+       				and bto.ticket_person_identity like CONCAT('%',#{ticketId})
+       			</if>
+       		</where>
+       		ORDER BY bto.create_time  DESC
+    </select>
+    
+    <select id="findByCreateTime" resultMap="busiTicketOrderResultMap">
+       	<include refid="searchSql"/>
+       		<where>
+       			<if test="uid != 1">
+		       		bto.create_userid = 3
+		       	</if>
+       			<if test="startTime != null and startTime != ''">
+       			 AND  <![CDATA[bto.create_time >= #{0}]]>	
+       			</if>
+       			<if test="endTime != null and endTime != ''">
+       				AND <![CDATA[bto.create_time <= #{1}]]>
+       			</if>
+       		</where>
+       		ORDER BY bto.create_time  DESC
+    </select>
+    
+    <select id="findStatisticsByCreateTime" resultMap="statisticsTicketOrderResultMap">
+       select SUM(bto.single_num) single_num,SUM(bto.single_num_privilege) single_num_privilege,SUM(bto.double_num) double_num,SUM(bto.double_num_privilege) double_num_privilege,ui.username
+		 ,bto.create_userid
+		 from busi_ticket_order bto INNER JOIN
+			user_info ui on(bto.update_userid=ui.uid)
+       		<where>
+       			bto.status = 0
+       			<if test="uid != 1">
+		       	 AND bto.update_userid = #{uid}
+		       	</if> 
+       			<if test="startTime != null and startTime != ''">
+       			 AND <![CDATA[bto.create_time >= #{startTime}]]>	
+       			</if>
+       			<if test="endTime != null and endTime != ''">
+       				AND <![CDATA[bto.create_time <= #{endTime}]]>
+       			</if>
+       		</where>
+    </select>
+    
+    <select id="findById" resultMap="busiTicketOrderResultMap">
+       	SELECT bto.id,bto.ticket_num,bto.ticket_person,bto.ticket_person_identity,bto.ticket_person_phone  
+       		   ,bto.single_num,bto.single_num_privilege,bto.double_num,bto.double_num_privilege	
+       		FROM busi_ticket_order bto
+       		<where>
+       			bto.id = #{0}
+       		</where>
+    </select>
+    
+    <insert id="save">
+    	INSERT INTO busi_ticket_order (
+			`single_num`, `single_num_privilege`,`double_num`, `double_num_privilege`, `status`,
+		     `ticket_person`, `ticket_person_identity`, `ticket_person_phone`,`create_userid`,`create_time`
+		)VALUES(
+			#{singleNum},#{singleNumPrivilege},#{doubleNum},#{doubleNumPrivilege},#{status},
+			#{ticketPerson},#{ticketPersonIdentity},#{ticketPersonPhone},#{createUserid},NOW())
+    </insert>
+    
+    <update id="update">
+    	update busi_ticket_order 
+    		<set>
+    			ticket_num = #{ticketNum},update_userid = #{updateUserid},update_time = NOW(),STATUS = 0
+    		</set>
+    		<where>
+				id = #{id}
+    		</where>
+    </update>
+
+</mapper>

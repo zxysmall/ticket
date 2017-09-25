@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yy.ticket.mapper.DemoMapper">
+
+
+    <resultMap id="demoResultMap" type="com.yy.core.bean.Demo">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+
+    <select id="likeName" resultMap="demoResultMap">
+       	select * from demo where name = #{name}
+    </select>
+    <select id="findAll" resultMap="demoResultMap">
+       	select * from demo
+    </select>
+    <select id="getById" resultMap="demoResultMap">
+       	select * from demo where name = #{name}
+    </select>
+    <select id="getNameById">
+       	select name from demo where id = #{id}
+    </select>
+
+</mapper>
