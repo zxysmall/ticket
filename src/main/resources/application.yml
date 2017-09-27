@@ -1,8 +1,8 @@
 spring:
     datasource:
         name: ticket
-        #url: jdbc:mysql://172.17.64.45:3306/ticket?characterEncoding=utf8&useSSL=false
-        url: jdbc:mysql://47.94.145.206:3306/ticket?characterEncoding=utf8&useSSL=false
+        #url: jdbc:mysql://localhost:3306/ticket?characterEncoding=utf8&useSSL=false
+        url: jdbc:mysql://localhost:3306/ticket?characterEncoding=utf8&useSSL=false
         username: root
         password: root
         # 使用druid数据源
