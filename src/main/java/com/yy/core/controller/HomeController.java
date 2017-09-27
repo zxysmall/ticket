@@ -43,6 +43,11 @@ public class HomeController {
 		return "login";
 	}
 	
+	@RequestMapping(value="/kickout",method=RequestMethod.GET)
+	public String kickout(){
+		return "kickout";
+	}
+	
 	// 登录提交地址和applicationontext-shiro.xml配置的loginurl一致。 (配置文件方式的说法)
 	@RequestMapping(value="/login",method=RequestMethod.POST)
 	public String login(Map<String, Object> map) throws Exception {

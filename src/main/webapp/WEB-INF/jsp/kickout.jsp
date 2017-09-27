@@ -6,6 +6,7 @@
 <meta charset="utf-8">
 <title>登录</title>
  <link rel="icon" type="image/x-icon" href="favicon.ico">
+ <%@include  file="commen.jsp" %>
 <style>
 /* background-position: center 24%; */
 body{margin:0;background-color: #f5f5f5;background-image:url(image/background2.jpg);right-border：none;background-size:100% auto;background-repeat: no-repeat;background-position: 100% 10%;}
@@ -70,7 +71,7 @@ input[type=checkbox]{height: 26px;width:18px;margin:0; padding:0; outline:none;f
 		<div class="login_box">
 			<div class="user">用户登录</div>
 			<span id="result"></span>
-			<form id="loginForm" method="post" action="">
+			<form id="loginForm" method="post" action="/ticket/login">
 				<input name="username" id="username" placeholder="请输入用户名" required="required" type="text"> 
 				<input name="password" id="password" placeholder="请输入登录密码"	required="required" type="password"> 
 				<label class="error">${msg }</label>
@@ -86,6 +87,27 @@ input[type=checkbox]{height: 26px;width:18px;margin:0; padding:0; outline:none;f
 			</form>
 		</div>
 	</div>
-</div> 
+</div>
+<script type="text/javascript">  
+    function kickout(){  
+       var href=location.href;  
+       if(href.indexOf("kickout")>0&&href.indexOf("JSESSIONID")>0){  
+    	   $.alert({
+               title: '安全提示!',
+               content: "您的账号在另一台设备上登录，您被挤下线，若不是您本人操作，请立即修改密码！",
+               icon: 'fa fa-rocket',
+               animation: 'scale',
+               closeAnimation: 'scale',
+               buttons: {
+                   okay: {
+                       text: '确定',
+                       btnClass: 'btn-blue'
+                   }
+               }
+           });
+       }   
+    }  
+    window.onload=kickout();   
+</script> 
 </body>
 </html>

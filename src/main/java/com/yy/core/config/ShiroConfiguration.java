@@ -1,20 +1,28 @@
 package com.yy.core.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.servlet.Filter;
 
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.yy.core.filter.KickoutSessionControlFilter;
 
 /**
  * Shiro 配置
@@ -44,11 +52,22 @@ public class ShiroConfiguration {
 	public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager){
 		LOGGER.debug("ShiroConfiguration.shirFilter()");
 		ShiroFilterFactoryBean shiroFilterFactoryBean  = new ShiroFilterFactoryBean();
-		
 		 // 必须设置 SecurityManager  
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
+		// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+		shiroFilterFactoryBean.setLoginUrl("/login");
+		// 登录成功后要跳转的链接
+		shiroFilterFactoryBean.setSuccessUrl("/index");
+		//未授权界面;
+		shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 		
-		//拦截器.
+		//自定义过滤器
+        Map<String, Filter> filtersMap = new LinkedHashMap<String, Filter>();
+        //限制同一帐号同时在线的个数。
+        filtersMap.put("kickout", kickoutSessionControlFilter());
+        shiroFilterFactoryBean.setFilters(filtersMap);
+		
+		//FilterChain 拦截器. 这里可以放在数据库加载进来
 		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String,String>();
         // 配置不会被拦截的链接 顺序判断
 		filterChainDefinitionMap.put("/**/*.png", "anon");
@@ -56,6 +75,7 @@ public class ShiroConfiguration {
 		filterChainDefinitionMap.put("/**/*.css", "anon");
 		filterChainDefinitionMap.put("/**/*.js", "anon");
 		filterChainDefinitionMap.put("/**/*.ico", "anon");
+		filterChainDefinitionMap.put("/kickout", "anon");
 		
 		//配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
 		filterChainDefinitionMap.put("/logout", "logout");
@@ -63,18 +83,12 @@ public class ShiroConfiguration {
 		//配置记住我或认证通过可以访问的地址
         filterChainDefinitionMap.put("/index", "user");
         filterChainDefinitionMap.put("/", "user");
-		
+        		
 		//<!-- 过滤链定义，从上向下顺序执行，一般将 /**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
 	    //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-		filterChainDefinitionMap.put("/**", "authc");
+		filterChainDefinitionMap.put("/**", "authc,kickout");
 		
-		// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-        shiroFilterFactoryBean.setLoginUrl("/login");
-        // 登录成功后要跳转的链接
-        shiroFilterFactoryBean.setSuccessUrl("/index");
-        //未授权界面;
-        shiroFilterFactoryBean.setUnauthorizedUrl("/403");
-		
+        
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilterFactoryBean;
 	}
@@ -93,6 +107,9 @@ public class ShiroConfiguration {
 		
 		//注入缓存管理器;
 		securityManager.setCacheManager(ehCacheManager());//这个如果执行多次，也是同样的一个对象;
+		
+		//注入session管理器;
+		securityManager.setSessionManager(sessionManager());//管理所有session
 		
 		//注入记住我管理器;
 		securityManager.setRememberMeManager(rememberMeManager());
@@ -143,6 +160,24 @@ public class ShiroConfiguration {
 	}
 	
 	
+    /**
+     * session管理器
+     * @return
+     */
+    @Bean
+    public DefaultWebSessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        sessionManager.setCacheManager(ehCacheManager());// 加入缓存管理器  
+//        sessionManager.setSessionDAO(enterpriseCacheSessionDAO());// 设置SessionDao  
+        sessionManager.setDeleteInvalidSessions(true);// 删除过期的session  
+        sessionManager.setGlobalSessionTimeout(12*60*60*1000);// 设置全局session超时时间  
+        sessionManager.setSessionValidationSchedulerEnabled(true);// 是否定时检查session  
+        Collection<SessionListener> listeners = new ArrayList<SessionListener>();
+        listeners.add(new MySessionListener());
+        sessionManager.setSessionListeners(listeners);
+        return sessionManager;
+    }
+    
 	/**
 	 * shiro缓存管理器;
 	 * 需要注入对应的其它的实体类中：
@@ -157,6 +192,20 @@ public class ShiroConfiguration {
 		cacheManager.setCacheManagerConfigFile("classpath:config/ehcache-shiro.xml");
 		return cacheManager;
 	}
+	
+	 /**
+	  * 可以用作分布式
+     * sessionDao管理器
+     * @return
+     */
+//    @Bean
+//    public EnterpriseCacheSessionDAO enterpriseCacheSessionDAO() {
+//    	//这里可以使用redis做分布式缓存
+//    	EnterpriseCacheSessionDAO sessionDao = new EnterpriseCacheSessionDAO();
+//    	sessionDao.setSessionIdGenerator(new JavaUuidSessionIdGenerator());
+//    	sessionDao.setCacheManager(ehCacheManager());
+//    	return sessionDao;
+//    }
 	
 	/**
 	 * cookie对象;
@@ -184,5 +233,27 @@ public class ShiroConfiguration {
 		return cookieRememberMeManager;
 	}
 	
+	/**
+	  * 不需要显示注册Bean
+	  * 限制同一账号登录同时登录人数控制
+	  * @return
+	  */
+	 public KickoutSessionControlFilter kickoutSessionControlFilter(){
+	     KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
+	     //使用cacheManager获取相应的cache来缓存用户登录的会话；用于保存用户—会话之间的关系的；
+	     //这里我们还是用之前shiro使用的redisManager()实现的cacheManager()缓存管理
+	     //也可以重新另写一个，重新配置缓存时间之类的自定义缓存属性
+	     kickoutSessionControlFilter.setCacheManager(ehCacheManager());
+	     //用于根据会话ID，获取会话进行踢出操作的；
+	     kickoutSessionControlFilter.setSessionManager(sessionManager());
+	     //是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；踢出顺序。
+	     kickoutSessionControlFilter.setKickoutAfter(false);
+	     //同一个用户最大的会话数，默认1；比如2的意思是同一个用户允许最多同时两个人登录；
+	     kickoutSessionControlFilter.setMaxSession(1);
+	     //被踢出后重定向到的地址；
+	     kickoutSessionControlFilter.setKickoutUrl("/kickout");
+	     return kickoutSessionControlFilter;
+	  }
+
 	
 }

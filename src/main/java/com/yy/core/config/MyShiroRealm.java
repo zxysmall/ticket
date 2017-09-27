@@ -54,10 +54,15 @@ public class MyShiroRealm extends AuthorizingRealm{
 		String username = (String)token.getPrincipal();
 //		System.out.println(token.getCredentials());//密码
 		LOGGER.debug("username:{}",username);//密码
-//		Subject subject = SecurityUtils.getSubject();
-//		if(subject.isAuthenticated())
-//		{
-//			subject.logout();
+		//处理session
+//		DefaultWebSecurityManager securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
+//		DefaultWebSessionManager sessionManager = (DefaultWebSessionManager)securityManager.getSessionManager();
+//		Collection<Session> sessions = sessionManager.getSessionDAO().getActiveSessions();//获取当前已登录的用户session列表
+//		for(Session session:sessions){
+//			//清除该用户以前登录时保存的session
+//			if(username.equals(String.valueOf(session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY)))) {
+//					sessionManager.getSessionDAO().delete(session);
+//			}
 //		}
 		//通过username从数据库中查找 User对象，如果找到，没找到.
 		//实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法

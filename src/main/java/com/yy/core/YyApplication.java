@@ -3,6 +3,7 @@ package com.yy.core;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -17,7 +18,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(basePackages={"com.yy"}) 
 @MapperScan("com.yy.**.mapper")
-public class YyApplication  extends SpringBootServletInitializer {
+//@EnableCaching(proxyTargetClass = true) // 开启缓存功能
+public class YyApplication  extends SpringBootServletInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(YyApplication.class);
 
     @Override
@@ -29,8 +31,14 @@ public class YyApplication  extends SpringBootServletInitializer {
 		ApplicationContext ctx = SpringApplication.run(YyApplication.class, args);
 		String[] activeProfiles = ctx.getEnvironment().getActiveProfiles();  
 	    for (String profile : activeProfiles) {  
-	    	LOGGER.warn("Spring Boot 使用profile为:{}" , profile);  
+	    	LOGGER.info("Spring Boot 使用profile为:{}" , profile);  
 	    }  
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		// TODO Auto-generated method stub
+		LOGGER.info("springboot启动完成！");
 	}
 	
 }

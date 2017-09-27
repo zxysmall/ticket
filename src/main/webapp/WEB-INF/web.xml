@@ -5,5 +5,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee" 
          xmlns:web="http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          xmlns="http://xmlns.jcp.org/xml/ns/javaee">
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>Ticket Application</display-name>
+  <session-config>    
+	<session-timeout>720</session-timeout>    
+</session-config> 
 </web-app>
